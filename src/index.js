@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
 import passportSetup from "./config/passport.js";
 import http from "http";
-import { CLIENT_URL } from "./utils/constants.js";
+import { CLIENT_URL, SERVER_PORT } from "./utils/constants.js";
 import Users from "./utils/users.js";
 
 // Routes
@@ -18,7 +18,6 @@ import UserRoutes from "./routes/user.routes.js";
 
 // constants
 const app = express();
-const SERVER_PORT = 8000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -51,12 +50,17 @@ app.use(
 
 passportSetup();
 
+// routes
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 app.use("/api/auth", AuthRoutes);
 app.get("/api/search", findUsers);
 app.use("/api/chats", ChatRoutes);
 app.use("/api/messages", MessageRoutes);
 app.use("/api/users", UserRoutes);
 
+// Socket server
 const users = new Users();
 
 io.on("connection", (socket) => {

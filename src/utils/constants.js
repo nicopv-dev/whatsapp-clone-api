@@ -1,5 +1,7 @@
 import "dotenv/config";
 
+export const SERVER_PORT = process.env.PORT || 8000;
+
 export const MONGO_USER = process.env.MONGO_USER;
 export const MONGO_PASS = process.env.MONGO_PASS;
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
