@@ -7,6 +7,7 @@ import { connectDB } from "./config/db.js";
 import passportSetup from "./config/passport.js";
 import http from "http";
 import { CLIENT_URL } from "./utils/constants.js";
+import Users from "./utils/users.js";
 
 // Routes
 import AuthRoutes from "./routes/auth.js";
@@ -56,11 +57,26 @@ app.use("/api/chats", ChatRoutes);
 app.use("/api/messages", MessageRoutes);
 app.use("/api/users", UserRoutes);
 
+const users = new Users();
+
 io.on("connection", (socket) => {
-  // Join to chat by id
-  socket.on("join_chat", (chat) => {
-    socket.join(chat);
-    // console.log(`User with Socket ID ${socket.id} joined chat ${chat}`);
+  // User connected
+  socket.on("user_connected", (user) => {
+    console.log("new user connection...");
+    const newUser = {
+      userId: user._id,
+      socketId: socket.id,
+    };
+    const usersExist = users.verifyUserExist(newUser);
+    if (!usersExist) {
+      users.addUser(newUser);
+    }
+    io.sockets.emit("users", users.getAllUsers());
+  });
+
+  // Join to chat by chatId / chat
+  socket.on("join_chat", (chatId) => {
+    socket.join(chatId);
   });
 
   // New message from user to especific chat and send to all users
@@ -70,6 +86,8 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
+    users.deleteUser(socket.id);
+    io.sockets.emit("users", users.getAllUsers());
   });
 });
 
