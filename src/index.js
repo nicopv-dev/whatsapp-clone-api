@@ -44,7 +44,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://whatsapp-clone-azure.vercel.app",
+      "https://whatsapp-clone-azure.vercel.app/",
     ],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
