@@ -40,28 +40,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://whatsapp-clone-azure.vercel.app",
-];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const message =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(message), false);
-      }
-
-      return callback(null, true);
-    },
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-);
+app.use(cors());
 
 passportSetup();
 
