@@ -9,3 +9,5 @@ export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 export const CLIENT_URL = process.env.CLIENT_URL;
+export const CALLBACK_URL =
+  process.env.CALLBACK_URL || "/api/auth/google/callback";

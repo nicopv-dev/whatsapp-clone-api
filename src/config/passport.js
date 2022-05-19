@@ -1,6 +1,10 @@
 import { Strategy } from "passport-google-oauth20";
 import passport from "passport";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "../utils/constants.js";
+import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  CALLBACK_URL,
+} from "../utils/constants.js";
 import User from "../models/User.js";
 
 export default function Setup() {
@@ -9,7 +13,7 @@ export default function Setup() {
       {
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "/api/auth/google/callback",
+        callbackURL: CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
         const userFound = await User.findOne({
