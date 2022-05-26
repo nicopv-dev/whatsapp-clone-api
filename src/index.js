@@ -1,7 +1,6 @@
 import express from "express";
 import cookieSession from "cookie-session";
 import passport from "passport";
-import cors from "cors";
 import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
 import passportSetup from "./config/passport.js";
@@ -41,13 +40,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-  cors({
-    origin: CLIENT_URL,
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
+  );
+  next();
+});
 
 passportSetup();
 
