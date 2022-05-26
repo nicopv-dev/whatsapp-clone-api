@@ -43,11 +43,7 @@ app.use(passport.session());
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://whatsapp-clone-azure.vercel.app",
-      "https://whatsapp-clone-azure.vercel.app/",
-    ],
+    origin: CLIENT_URL,
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -71,7 +67,6 @@ const users = new Users();
 io.on("connection", (socket) => {
   // User connected
   socket.on("user_connected", (user) => {
-    console.log("new user connection...");
     const newUser = {
       userId: user._id,
       socketId: socket.id,
@@ -91,6 +86,16 @@ io.on("connection", (socket) => {
   // New message from user to especific chat and send to all users
   socket.on("new_message", (data) => {
     io.to(data.chatId).emit("receive_message", data);
+  });
+
+  // Writing new message
+  socket.on("writing_message", (data) => {
+    io.to(data.chatId).emit("writing_message", data);
+  });
+
+  // Stop writing new message
+  socket.on("stop_writing_message", (data) => {
+    io.to(data.chatId).emit("stop_writing_message", data);
   });
 
   socket.on("disconnect", () => {
