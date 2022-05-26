@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
 import passportSetup from "./config/passport.js";
 import http from "http";
+import cors from "cors";
 import { CLIENT_URL, SERVER_PORT } from "./utils/constants.js";
 import Users from "./utils/users.js";
 
@@ -41,15 +42,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
-  );
-  next();
-});
+app.use(cors());
 
 passportSetup();
 
