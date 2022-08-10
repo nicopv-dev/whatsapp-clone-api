@@ -24,6 +24,7 @@ const io = new Server(server, {
     origin: CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
+    optionsSuccessStatus: 200,
   },
 });
 
