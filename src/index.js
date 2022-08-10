@@ -1,12 +1,12 @@
 import express from "express";
 import cookieSession from "cookie-session";
 import passport from "passport";
-import cors from "cors";
 import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
 import passportSetup from "./config/passport.js";
 import http from "http";
-import { CLIENT_URL } from "./utils/constants.js";
+import cors from "cors";
+import { CLIENT_URL, SERVER_PORT } from "./utils/constants.js";
 import Users from "./utils/users.js";
 
 // Routes
@@ -18,12 +18,13 @@ import UserRoutes from "./routes/user.routes.js";
 
 // constants
 const app = express();
-const SERVER_PORT = 8000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: CLIENT_URL,
     methods: ["GET", "POST"],
+    credentials: true,
+    optionsSuccessStatus: 200,
   },
 });
 
@@ -41,28 +42,33 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    methods: "GET,POST,PUT,DELETE",
+    origin: CLIENT_URL,
+    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
     credentials: true,
   })
 );
 
 passportSetup();
 
+// routes
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 app.use("/api/auth", AuthRoutes);
 app.get("/api/search", findUsers);
 app.use("/api/chats", ChatRoutes);
 app.use("/api/messages", MessageRoutes);
 app.use("/api/users", UserRoutes);
 
+// Socket server
 const users = new Users();
 
 io.on("connection", (socket) => {
   // User connected
   socket.on("user_connected", (user) => {
-    console.log("new user connection...");
     const newUser = {
       userId: user._id,
       socketId: socket.id,
@@ -82,6 +88,16 @@ io.on("connection", (socket) => {
   // New message from user to especific chat and send to all users
   socket.on("new_message", (data) => {
     io.to(data.chatId).emit("receive_message", data);
+  });
+
+  // Writing new message
+  socket.on("writing_message", (data) => {
+    io.to(data.chatId).emit("writing_message", data);
+  });
+
+  // Stop writing new message
+  socket.on("stop_writing_message", (data) => {
+    io.to(data.chatId).emit("stop_writing_message", data);
   });
 
   socket.on("disconnect", () => {
